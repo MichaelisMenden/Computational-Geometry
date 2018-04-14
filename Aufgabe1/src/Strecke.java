@@ -1,36 +1,31 @@
+import java.awt.Point;
+import java.awt.geom.Point2D;
+
 
 public class Strecke {
-	
-	private float xStart;
-	private float yStart;
-	private float xEnd;
-	private float yEnd;
+	private Point2D.Float start = new Point2D.Float();
+	private Point2D.Float end = new Point2D.Float();
 	
 	public Strecke(float xStart, float yStart, float xEnd, float yEnd) {
-		this.xStart = xStart;
-		this.yStart = yStart;
-		this.xEnd = xEnd;
-		this.yEnd = yEnd;
+		start.x = xStart;
+		start.y = yStart;
+		end.x = xEnd;
+		end.y = yEnd;
 	}
 
 	public float getxStart() {
-		return xStart;
+		return start.x;
 	}
 
 	public float getyStart() {
-		return yStart;
+		return start.y;
 	}
 
 	public float getxEnd() {
-		return xEnd;
+		return end.x;
 	}
 
 	public float getyEnd() {
-		return yEnd;
+		return end.y;
 	}
-
-
-
-
-
 }
