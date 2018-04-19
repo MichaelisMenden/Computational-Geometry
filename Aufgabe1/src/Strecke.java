@@ -12,6 +12,12 @@ public class Strecke {
 		end.x = xEnd;
 		end.y = yEnd;
 	}
+	public Point2D.Float getStartPoint() {
+		return start;
+	}
+	public Point2D.Float getEndPoint() {
+		return end;
+	}
 
 	public float getxStart() {
 		return start.x;

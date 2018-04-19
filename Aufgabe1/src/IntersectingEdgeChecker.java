@@ -10,11 +10,11 @@ public class IntersectingEdgeChecker {
 	
 	
 	
-	protected ArrayList<Strecke> readFile() {
+	protected ArrayList<Strecke> readFile(String path) {
 		ArrayList<Strecke> Strecken = new ArrayList<Strecke>();
 		FileReader fr;
 		try {
-			fr = new FileReader("C:\\Users\\Michi\\Dropbox\\Michi Uniordner\\Master\\2.Semester\\Computational Geometry\\Aufgabe1\\src\\s_1000_1.dat");
+			fr = new FileReader(path);
 		    BufferedReader br = new BufferedReader(fr);
 
 		    String zeile = br.readLine();
@@ -41,6 +41,20 @@ public class IntersectingEdgeChecker {
 		edge[1] = (p3.x - p2.x) * (p3.y + p2.y);
 		edge[2] = (p1.x - p3.x) * (p1.y + p3.y);
 		return edge[0] + edge[1] + edge[2];
+	}
+	
+	public int doIntersect(Strecke s1, Strecke s2) {
+		//kolinear und überlapppend
+		if (ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getStartPoint()) == 0 && ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getEndPoint()) == 0) {
+			return 0;	
+		}
+		//Start und Endpunkt von s1 liegen auf verschiedenen Seiten von s2 und umgekehrt
+		if (ccw(s1.getStartPoint(),s1.getEndPoint(),s2.getStartPoint()) * ccw(s1.getStartPoint(),s1.getEndPoint(),s2.getEndPoint()) <= 0 &&
+			ccw(s2.getStartPoint(),s2.getEndPoint(),s1.getStartPoint()) * ccw(s2.getStartPoint(),s2.getEndPoint(),s1.getEndPoint()) <= 0) {
+			return 1;
+		}
+		//Schneiden sich nicht
+		return -1;
 	}
 
 }
