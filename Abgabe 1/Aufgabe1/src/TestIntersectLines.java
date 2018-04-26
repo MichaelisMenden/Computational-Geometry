@@ -18,7 +18,7 @@ public class TestIntersectLines {
 		Point2D.Float p2 = new Point2D.Float(1,1);
 		Point2D.Float p3 = new Point2D.Float(0,1);
 		assertTrue(iec.ccw(p1,p2,p3) < 0); 
-		//Punkte gegen den Uhrzeigersinn
+		//Punkte im Uhrzeigersinn
 		p1 = new Point2D.Float(0,0);
 		p2 = new Point2D.Float(0,1);
 		p3 = new Point2D.Float(1,1);
@@ -27,7 +27,12 @@ public class TestIntersectLines {
 		p1 = new Point2D.Float(0,0);
 		p2 = new Point2D.Float(1,1);
 		p3 = new Point2D.Float(2,2);
-		assertTrue(iec.ccw(p1,p2,p3) == 0); 	
+		assertTrue(iec.ccw(p1,p2,p3) == 0);
+		//Punkte liegen aufeinander
+		p1 = new Point2D.Float(0,0);
+		p2 = new Point2D.Float(0,0);
+		p3 = new Point2D.Float(0,0);
+		assertTrue(iec.ccw(p1,p2,p3) == 0);
 	}
 	
 	@Test

@@ -62,7 +62,7 @@ public class Main {
 		Strecken.clear();
 		
 		//3.Datei
-		path = "C:\\Users\\Michi\\Documents\\Computational Geometry\\Aufgabe1\\src\\s_10000_1.dat";
+		path = "C:\\Users\\Michi\\Documents\\Computational Geometry\\Aufgabe1\\src\\s_100000_1.dat";
 		Strecken = iec.readFile(path);
 		start = System.currentTimeMillis();
 		for(Strecke s1 : Strecken) {

@@ -36,7 +36,7 @@ public class IntersectingEdgeChecker {
 	}
 	
 	public float ccw(Point2D.Float p1, Point2D.Float p2, Point2D.Float p3) {
-		float edge[] = new float[3];  //Funktioniert das auch mit Float? ich hoffe ja :D
+		float edge[] = new float[3];
 		edge[0] = (p2.x - p1.x) * (p2.y + p1.y);
 		edge[1] = (p3.x - p2.x) * (p3.y + p2.y);
 		edge[2] = (p1.x - p3.x) * (p1.y + p3.y);
