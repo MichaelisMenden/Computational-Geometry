@@ -20,7 +20,16 @@ public class IntersectingEdgeChecker {
 		    String zeile = br.readLine();
 		    while(zeile != null) {
 		    	String[] zeilenArray = zeile.split(" ");
-		    	Strecke s = new Strecke(Float.parseFloat(zeilenArray[0]),Float.parseFloat(zeilenArray[1]),Float.parseFloat(zeilenArray[2]),Float.parseFloat(zeilenArray[3]));
+		    	//Die die links anfangen sind die Startpunkte
+		    	float x1 = Float.parseFloat(zeilenArray[0]);
+		    	float x2 = Float.parseFloat(zeilenArray[2]);
+		    	Strecke s;
+		    	if(x1 <= x2) {
+		    		s = new Strecke(x1,Float.parseFloat(zeilenArray[1]),x2,Float.parseFloat(zeilenArray[3]));
+		    	}
+		    	else {
+		    		s = new Strecke(x2,Float.parseFloat(zeilenArray[3]),x1,Float.parseFloat(zeilenArray[1]));
+		    	}	    	
 		    	Strecken.add(s);
 		    	zeile = br.readLine();
 		    }
@@ -55,6 +64,21 @@ public class IntersectingEdgeChecker {
 		}
 		//Schneiden sich nicht
 		return -1;
+	}
+	
+	public Point2D.Float getIntersectionPoint(Strecke s1, Strecke s2) {
+		int i = doIntersect(s1,s2);
+		if(doIntersect(s1,s2) == 1) {
+			Point2D.Float p1 = s1.getStartPoint();
+			Point2D.Float p2 = s1.getEndPoint();
+			Point2D.Float p3 = s2.getStartPoint();
+			Point2D.Float p4 = s2.getEndPoint();
+			float xs = (float) (((p4.getX() - p3.getX()) * (p2.getX()*p1.getY() - p1.getX()*p2.getY()) - (p2.getX() - p1.getX()) * (p4.getX()*p3.getY() - p3.getX()*p4.getY())) / ((p4.getY() - p3.getY()) * (p2.getX() - p1.getX()) - (p2.getY() - p1.getY()) * (p4.getX() - p3.getX())));
+			float ys = (float) (((p1.getY() - p2.getY()) * (p4.getX()*p3.getY() - p3.getX()*p4.getY()) - (p3.getY() - p4.getY()) * (p2.getX()*p1.getY() - p1.getX()*p2.getY())) / ((p4.getY() - p3.getY()) * (p2.getX() - p1.getX()) - (p2.getY() - p1.getY()) * (p4.getX() - p3.getX())));
+			return new Point2D.Float(xs, ys);
+		}
+		
+		return null;
 	}
 
 }
