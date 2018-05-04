@@ -54,6 +54,8 @@ public class IntersectingEdgeChecker {
 	
 	public int doIntersect(Strecke s1, Strecke s2) {
 		//kolinear und überlapppend
+			float test = ccw(s1.getStartPoint(),s1.getEndPoint(),s2.getStartPoint()) * ccw(s1.getStartPoint(),s1.getEndPoint(),s2.getEndPoint());
+			float test1 = ccw(s2.getStartPoint(),s2.getEndPoint(),s1.getStartPoint()) * ccw(s2.getStartPoint(),s2.getEndPoint(),s1.getEndPoint());
 		if (ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getStartPoint()) == 0 && ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getEndPoint()) == 0) {
 			return 0;	
 		}

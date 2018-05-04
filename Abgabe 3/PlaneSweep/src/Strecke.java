@@ -34,12 +34,16 @@ public class Strecke {
 	public float getyEnd() {
 		return end.y;
 	}
+	public void setBothX(float x) {
+		start.x = x;
+		end.x = x;
+	}
 	
 	@Override
 	public boolean equals(Object o) {
 		Strecke s = (Strecke) o;
-		if(this.getxStart() - s.getxStart() < 0.00001 && this.getyStart() - s.getyStart() < 0.00001 && 
-				this.getxEnd() - s.getxEnd() < 0.00001 && this.getyEnd() - s.getyEnd() < 0.00001) {
+		if(Math.abs(this.getxStart() - s.getxStart()) < 0.000000001 && Math.abs(this.getyStart() - s.getyStart()) < 0.000000001 && 
+				Math.abs(this.getxEnd() - s.getxEnd()) < 0.000000001 && Math.abs(this.getyEnd() - s.getyEnd()) < 0.000000001) {
 			return true;
 		}
 		return false;
