@@ -14,5 +14,17 @@ public abstract class Event {
 
 
 	public abstract void doEvent();
+	
+	@Override
+	public boolean equals(Object o) {
+		Event e = (Event) o;
+		
+		if((e.strecke.equals(strecke2) && e.strecke2.equals(strecke)) || (e.strecke.equals(strecke) && e.strecke2.equals(strecke2))) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
 }

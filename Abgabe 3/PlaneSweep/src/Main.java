@@ -18,16 +18,19 @@ public class Main {
 	
 	public static <IntetsectingEdgeChecker> void main(String[] args) {
 		initEventQueue();
-
-		
+		long start = System.currentTimeMillis();
 		while(!eventQueue.isEmpty()) {
 			Entry<Float, Event> E = eventQueue.firstEntry();
 			float x = E.getKey();
 
 			E.getValue().doEvent();
+						
 			eventQueue.remove(eventQueue.firstEntry().getKey());
 			System.out.println(eventQueue.size());
+			//System.out.println(L.size());
 		}
+		long end = System.currentTimeMillis();
+		System.out.println(end-start + " ms");
 		doOutput();
 	}
 	
@@ -38,17 +41,26 @@ public class Main {
 			float xLeft = strecke.getxStart();
 			float xRight = strecke.getxEnd();
 			char a = 'a';
-			eventQueue.put(xLeft, new Event(strecke) {
+			float[] keys = keyCollision(xLeft,xRight);
+			eventQueue.put(keys[0], new Event(strecke) {
 				public void doEvent() {
-					treatLeftEndpoint(new SimpleEntry<Float,Strecke>(xLeft,strecke));
+					treatLeftEndpoint(new SimpleEntry<Float,Strecke>(keys[0],strecke));
 				}
 			});
-			eventQueue.put(xRight, new Event(strecke) {
+			eventQueue.put(keys[1], new Event(strecke) {
 				public void doEvent() {
-					treatRightEndpoint(new SimpleEntry<Float,Strecke>(xRight,strecke));
+					treatRightEndpoint(new SimpleEntry<Float,Strecke>(keys[1],strecke));
 				}
 			});
 		}
+	}
+	private static float[] keyCollision(float xLeft, float xRight) {
+		if(eventQueue.containsKey(xLeft))
+			xLeft += .0001;
+		if(eventQueue.containsKey(xRight))
+			xRight -= .0001;
+		return new float[]{xLeft,xRight};
+	
 	}
 	
 	public static void treatLeftEndpoint(SimpleEntry<Float,Strecke> e) {
@@ -92,12 +104,22 @@ public class Main {
 	}
 
 	public static boolean insertIntersection(Point2D.Float intersectionPoint, Strecke segmA, Strecke segmB) {
-		if(intersectionPoint != null) {		//Wenn sie sich schneiden
-			Event queueEntry = findNextPoint(intersectionPoint);
 
-			//Wenns Intersection nicht gibt && Wenn zum zugehörigen Key(float x - Wert des IntersectionPoints) nicht die richtigen Strecken dazugehören
-			if(queueEntry == null || queueEntry.strecke != null &&queueEntry.strecke2 != null &&
-					!(queueEntry.strecke.equals(segmA) && queueEntry.strecke2.equals(segmB) || queueEntry.strecke.equals(segmB) && queueEntry.strecke2.equals(segmA))) {   //Wenn das Intersection Event noch nicht in der EventQueue ist
+		if(intersectionPoint != null ) {		//Wenn sie sich schneiden oder IntersectionPoint schon in L
+			Event e = new Event(segmA, segmB) {
+				public void doEvent() {
+					treatIntersection(intersectionPoint,this);
+				}
+			};
+			SimpleEntry<Point2D.Float,Event> se = new SimpleEntry<Point2D.Float,Event>(intersectionPoint, e);
+			if(L.contains(se))
+				return false;
+			
+			Event queueEntry = intersectionExists(intersectionPoint);
+
+			//Wenns Intersection noch nicht gibt 
+			if(queueEntry == null  ||
+					!((queueEntry.strecke.equals(segmA) && queueEntry.strecke2.equals(segmB)) || (queueEntry.strecke.equals(segmB) && queueEntry.strecke2.equals(segmA)))) {   //Wenn das Intersection Event noch nicht in der EventQueue ist
 				eventQueue.put((float) intersectionPoint.getX(), new Event(segmA, segmB) {
 					public void doEvent() {
 						treatIntersection(intersectionPoint,this);
@@ -109,21 +131,32 @@ public class Main {
 		return false;
 	}
 
-	public static Event findNextPoint(Point2D.Float intersectionPoint) {
-		float distCeiling = eventQueue.ceilingEntry((float) intersectionPoint.getX()).getKey() - (float) intersectionPoint.getX();
-		float distFloor = (float) intersectionPoint.getX() - eventQueue.ceilingEntry((float) intersectionPoint.getX()).getKey();
+	//Methode die prüft ob es den Intersectionpoint schon gibt,wenn nicht wird null zurückgegeben
+	public static Event intersectionExists(Point2D.Float intersectionPoint) {
+		//Hier dürfen nur  Intersectionpoints geprüft werden
+		float distCeiling = 10, distFloor = 10;
+		if(eventQueue.ceilingEntry((float) intersectionPoint.getX()) != null)
+			distCeiling = Math.abs(eventQueue.ceilingEntry((float) intersectionPoint.getX()).getKey() - (float) intersectionPoint.getX());
+		if(eventQueue.floorEntry((float) intersectionPoint.getX()) != null)
+			distFloor = Math.abs((float) intersectionPoint.getX() - eventQueue.floorEntry((float) intersectionPoint.getX()).getKey());
 		
-		if(distCeiling < distFloor && distCeiling < 0.00001) {
+		if(distCeiling <= distFloor && distCeiling < 0.000001) {
 			if(eventQueue.floorEntry((float) intersectionPoint.getX()) != null) {
 				Event e = (Event) eventQueue.ceilingEntry((float) intersectionPoint.getX()).getValue();
-				return (Event) eventQueue.ceilingEntry((float) intersectionPoint.getX()).getValue();
+				if(e.strecke != null && e.strecke2 != null)
+					return (Event) e;
+				else
+					return null;
 			}
 		}
 		
-		if(distCeiling > distFloor && distFloor < 0.00001) {
+		if(distCeiling >= distFloor && distFloor < 0.000001) {
 			if(eventQueue.floorEntry((float) intersectionPoint.getX()) != null) {
 				Event e = (Event) eventQueue.floorEntry((float) intersectionPoint.getX()).getValue();
-				return e;
+				if(e.strecke != null && e.strecke2 != null)
+					return e;
+				else
+					return null;
 			}
 
 		}
@@ -171,13 +204,11 @@ public class Main {
 				final Point2D.Float iP = iec.getIntersectionPoint(e.strecke2, segmA);
 				insertIntersection(iP,e.strecke2,segmA);
 			}
-			if(indexStrecke2 != SL.size()-1) {//Falls es nicht schon die unterste Strecke war
+			if(indexStrecke2 < SL.size()-2) {//Falls es nicht schon die unterste Strecke war
 				segmB = SL.get(indexStrecke2 +1);	//SegmentB ist 1 niedriger als Strecke 2 die Tausch niedriger als Strecke 1 war
 				final Point2D.Float iP2 = iec.getIntersectionPoint(e.strecke, segmB);
 				insertIntersection(iP2,e.strecke,segmB);
 			}
-			
-
 		}
 		if(indexStrecke1 > indexStrecke2) {   //Strecke 1 war vorher niedriger als Strecke 2
 
@@ -186,12 +217,13 @@ public class Main {
 				final Point2D.Float iP2 = iec.getIntersectionPoint(e.strecke, segmA);
 				insertIntersection(iP2,e.strecke,segmA);
 			}
-			if(indexStrecke2 != SL.size()-1) {
+			if(indexStrecke2 < SL.size()-2) {
 				segmB = SL.get(indexStrecke1 + 1);//SegmentB ist 1 niedriger als Strecke 1 die vor Tausch niedriger als Strecke 2 war
 				final Point2D.Float iP = iec.getIntersectionPoint(e.strecke2, segmB);
 				insertIntersection(iP,e.strecke2,segmB);
 			}
-		}		
+		}
+		int t = 0;
 	}
 	public static void doOutput() {
 		System.out.println("Es exisitieren " + L.size() + "Schnittpunkte");

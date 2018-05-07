@@ -48,4 +48,9 @@ public class Strecke {
 		}
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return "Start-X = " + start.x + "Start-Y = " + start.y + "End-X = " + end.x + "End-Y = " + end.y;
+	}
 }
