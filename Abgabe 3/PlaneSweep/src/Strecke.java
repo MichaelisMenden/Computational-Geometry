@@ -51,6 +51,6 @@ public class Strecke {
 	
 	@Override
 	public String toString() {
-		return "Start-X = " + start.x + "Start-Y = " + start.y + "End-X = " + end.x + "End-Y = " + end.y;
+		return "Start-X= " + start.x + "  Start-Y= " + start.y + "  End-X= " + end.x + "  End-Y= " + end.y;
 	}
 }

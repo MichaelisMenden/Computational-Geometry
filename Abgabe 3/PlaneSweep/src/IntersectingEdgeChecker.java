@@ -54,8 +54,8 @@ public class IntersectingEdgeChecker {
 	
 	public int doIntersect(Strecke s1, Strecke s2) {
 		//kolinear und überlapppend
-			float test = ccw(s1.getStartPoint(),s1.getEndPoint(),s2.getStartPoint()) * ccw(s1.getStartPoint(),s1.getEndPoint(),s2.getEndPoint());
-			float test1 = ccw(s2.getStartPoint(),s2.getEndPoint(),s1.getStartPoint()) * ccw(s2.getStartPoint(),s2.getEndPoint(),s1.getEndPoint());
+			float test = ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getStartPoint());
+			float test1 = ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getEndPoint());
 		if (ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getStartPoint()) == 0 && ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getEndPoint()) == 0) {
 			return 0;	
 		}
@@ -69,6 +69,12 @@ public class IntersectingEdgeChecker {
 	}
 	
 	public Point2D.Float getIntersectionPoint(Strecke s1, Strecke s2) {
+		//Tausch falls s1 Linie mit nur einem Punkt ist
+		/*if(s1.getStartPoint().equals(s1.getEndPoint())) {
+			Strecke swap = s1;
+			s1 = s2;
+			s2 = swap;
+		}*/
 		int i = doIntersect(s1,s2);
 		if(doIntersect(s1,s2) == 1) {
 			Point2D.Float p1 = s1.getStartPoint();
@@ -78,6 +84,15 @@ public class IntersectingEdgeChecker {
 			float xs = (float) (((p4.getX() - p3.getX()) * (p2.getX()*p1.getY() - p1.getX()*p2.getY()) - (p2.getX() - p1.getX()) * (p4.getX()*p3.getY() - p3.getX()*p4.getY())) / ((p4.getY() - p3.getY()) * (p2.getX() - p1.getX()) - (p2.getY() - p1.getY()) * (p4.getX() - p3.getX())));
 			float ys = (float) (((p1.getY() - p2.getY()) * (p4.getX()*p3.getY() - p3.getX()*p4.getY()) - (p3.getY() - p4.getY()) * (p2.getX()*p1.getY() - p1.getX()*p2.getY())) / ((p4.getY() - p3.getY()) * (p2.getX() - p1.getX()) - (p2.getY() - p1.getY()) * (p4.getX() - p3.getX())));
 			return new Point2D.Float(xs, ys);
+		}
+		//Falls kolinear überlappend(z.B. bei Linie die nur Punkt ist)
+		if(doIntersect(s1,s2) == 0) {
+			if(s1.getStartPoint().equals(s1.getEndPoint())) {
+				return s1.getStartPoint();
+			}
+			if(s2.getStartPoint().equals(s2.getEndPoint())) {
+				return s2.getStartPoint();
+			}
 		}
 		
 		return null;

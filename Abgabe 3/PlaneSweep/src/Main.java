@@ -14,6 +14,7 @@ public class Main {
 	static ArrayList<Strecke> Strecken;
 	private static IntersectingEdgeChecker iec = new IntersectingEdgeChecker();
 	private static Strecke SLStrecke = new Strecke(0,-10000,0,10000);
+	private static ArrayList<Strecke> specialLines = new ArrayList<Strecke>();
 	
 	
 	public static <IntetsectingEdgeChecker> void main(String[] args) {
@@ -29,15 +30,26 @@ public class Main {
 			System.out.println(eventQueue.size());
 			//System.out.println(L.size());
 		}
+		treatSpecialLines();		
 		long end = System.currentTimeMillis();
-		System.out.println(end-start + " ms");
 		doOutput();
+		System.out.println(end-start + " ms");
 	}
 	
 	public static void initEventQueue() {
-		Strecken = iec.readFile(".\\src\\s_1000_10.dat");
+		Strecken = iec.readFile(".\\src\\s_1000_1.dat");
 		for(int i = 0; i < Strecken.size(); i++) {
 			Strecke strecke = Strecken.get(i);
+			//Behandlung von vertikalen Strecken
+			if(strecke.getxStart() == strecke.getxEnd() && strecke.getyStart() != strecke.getyEnd()) {
+				specialLines.add(strecke);
+				continue;
+			}
+			//Behandlung von Strecke bei der Anfangs und Endpunkt gleich sind
+			if(strecke.getStartPoint().equals(strecke.getEndPoint())) {
+				specialLines.add(strecke);
+				continue;
+			}
 			float xLeft = strecke.getxStart();
 			float xRight = strecke.getxEnd();
 			char a = 'a';
@@ -55,9 +67,9 @@ public class Main {
 		}
 	}
 	private static float[] keyCollision(float xLeft, float xRight) {
-		if(eventQueue.containsKey(xLeft))
+		while(eventQueue.containsKey(xLeft))
 			xLeft += .0001;
-		if(eventQueue.containsKey(xRight))
+		while(eventQueue.containsKey(xRight))
 			xRight -= .0001;
 		return new float[]{xLeft,xRight};
 	
@@ -112,6 +124,15 @@ public class Main {
 				}
 			};
 			SimpleEntry<Point2D.Float,Event> se = new SimpleEntry<Point2D.Float,Event>(intersectionPoint, e);
+			//Falls Schittpunkt Anfangs eines der Segmente
+			boolean test1 = segmA.getStartPoint().equals(intersectionPoint);
+			boolean test2 = segmB.getStartPoint().equals(intersectionPoint);
+			boolean test3 = !L.contains(se);
+			if((segmA.getStartPoint().equals(intersectionPoint) | segmB.getStartPoint().equals(intersectionPoint)) && !L.contains(se)) {
+				L.add(se);
+				return true;
+			}
+
 			if(L.contains(se))
 				return false;
 			
@@ -223,9 +244,52 @@ public class Main {
 				insertIntersection(iP,e.strecke2,segmB);
 			}
 		}
-		int t = 0;
 	}
 	public static void doOutput() {
+		System.out.println("Folgende Linien schneiden sich: ");
+		for(int i = 0; i < L.size(); i++) {
+			Strecke s1 = L.get(i).getValue().strecke;
+			Strecke s2 = L.get(i).getValue().strecke2;
+			Point2D.Float p = L.get(i).getKey();
+			System.out.println("Strecke: " + s1 + " schneidet sich mit Strecke: " + s2 + " in Punkt X:" + p.getX() + " Y: " + p.getY());
+		}
 		System.out.println("Es exisitieren " + L.size() + "Schnittpunkte");
+	}
+	
+	public static void treatSpecialLines() {
+		//Behandlung spezieller Linien
+		for(Strecke specialLine : specialLines) {
+			for(Strecke strecke : Strecken) {
+				//Behandlung von Strecken deren Anfangs und Endpunkt gleich ist
+				if(specialLine.getStartPoint().equals(specialLine.getEndPoint())) {
+					//doIntersect kann nicht als einziges Kriterium verwendet werden, daher zusätzliche Abfrage ob überschneidung möglich ist
+					if(iec.doIntersect(specialLine, strecke) == 0 && ((specialLine.getxStart() >= strecke.getxStart() &&specialLine.getxStart() <= strecke.getxEnd())
+							&& (specialLine.getyStart() >= strecke.getyStart() && specialLine.getyStart() <= strecke.getyEnd())) && !specialLine.equals(strecke)) {
+						Point2D.Float intersectionPoint = iec.getIntersectionPoint(specialLine, strecke);
+						Event e = new Event(specialLine, strecke) {
+							public void doEvent() {
+								treatIntersection(intersectionPoint,this);
+							}
+						};
+						SimpleEntry<Point2D.Float,Event> se = new SimpleEntry<Point2D.Float,Event>(intersectionPoint, e);
+						L.add(se);
+						continue;
+					}
+				} else {
+					//Behandlung vertikaler Strecken
+					if(iec.getIntersectionPoint(specialLine, strecke) != null) {
+						Point2D.Float intersectionPoint = iec.getIntersectionPoint(specialLine, strecke);
+						Event e = new Event(specialLine, strecke) {
+							public void doEvent() {
+								treatIntersection(intersectionPoint,this);
+							}
+						};
+						SimpleEntry<Point2D.Float,Event> se = new SimpleEntry<Point2D.Float,Event>(intersectionPoint, e);
+						L.add(se);
+						continue;
+					}
+				}
+			}
+		}
 	}
 }
