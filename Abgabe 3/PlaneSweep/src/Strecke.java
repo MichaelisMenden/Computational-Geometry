@@ -3,38 +3,38 @@ import java.awt.geom.Point2D;
 
 
 public class Strecke {
-	private Point2D.Float start = new Point2D.Float();
-	private Point2D.Float end = new Point2D.Float();
+	private Point2D.Double start = new Point2D.Double();
+	private Point2D.Double end = new Point2D.Double();
 	
-	public Strecke(float xStart, float yStart, float xEnd, float yEnd) {
+	public Strecke(double xStart, double yStart, double xEnd, double yEnd) {
 		start.x = xStart;
 		start.y = yStart;
 		end.x = xEnd;
 		end.y = yEnd;
 	}
-	public Point2D.Float getStartPoint() {
+	public Point2D.Double getStartPoint() {
 		return start;
 	}
-	public Point2D.Float getEndPoint() {
+	public Point2D.Double getEndPoint() {
 		return end;
 	}
 
-	public float getxStart() {
+	public double getxStart() {
 		return start.x;
 	}
 
-	public float getyStart() {
+	public double getyStart() {
 		return start.y;
 	}
 
-	public float getxEnd() {
+	public double getxEnd() {
 		return end.x;
 	}
 
-	public float getyEnd() {
+	public double getyEnd() {
 		return end.y;
 	}
-	public void setBothX(float x) {
+	public void setBothX(double x) {
 		start.x = x;
 		end.x = x;
 	}
@@ -51,6 +51,7 @@ public class Strecke {
 	
 	@Override
 	public String toString() {
-		return "Start-X= " + start.x + "  Start-Y= " + start.y + "  End-X= " + end.x + "  End-Y= " + end.y;
+		//return "Start-X= " + start.x + "  Start-Y= " + start.y + "  End-X= " + end.x + "  End-Y= " + end.y;
+		return "Strecke(Punkt[{" + start.x + "," + start.y + "}],Punkt[{" + end.x + "," + end.y + "}])";
 	}
 }
