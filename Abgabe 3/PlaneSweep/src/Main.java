@@ -6,8 +6,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class Main {
-	// evtl Entry gegen Strecke tauschen da jetzt klar ist das start immer links
-	// ist
+	// evtl Entry gegen Strecke tauschen da jetzt klar ist das start immer links ist
 	private static TreeMap<Double, Event> eventQueue = new TreeMap<Double, Event>();
 	private static ArrayList<Strecke> SL = new ArrayList<Strecke>();
 	private static ArrayList<SimpleEntry<Point2D.Double, Event>> L = new ArrayList<SimpleEntry<Point2D.Double, Event>>();
@@ -101,6 +100,25 @@ public class Main {
 			SL.add(segmE);
 			return new Strecke[] { null, null };
 		}
+		//Falls nur 1 Eintrag in SL
+		if (SL.size() == 1) {
+			SegmA = SL.get(0);
+			Point2D.Double pA = iec.getIntersectionPoint(SegmA, SLStrecke);
+			if(pA.getY() >= segmE.getxStart()) {
+				SL.add(1, segmE);
+				return new Strecke[] { SegmA, null };
+			}
+			else {
+				SL.add(0,segmE);
+				return new Strecke[] { null, SegmA };
+			}
+		}
+		//Falls einzufügendes Segment höher als erstes Element in SweepLine
+		SegmA = SL.get(0);
+		if(iec.getIntersectionPoint(SegmA, SLStrecke).y < iec.getIntersectionPoint(segmE, SLStrecke).y) {
+			SL.add(0,segmE);
+			return new Strecke[] { null, SegmA };
+		}
 
 		for (int i = 0; i < SL.size() - 1; i++) {
 			SegmA = SL.get(i);
@@ -109,13 +127,9 @@ public class Main {
 			Point2D.Double pB = iec.getIntersectionPoint(SegmB, SLStrecke);
 			Point2D.Double pE = iec.getIntersectionPoint(segmE, SLStrecke);
 
-			if ((pA.getY() >= pE.getY() && iec.getIntersectionPoint(SegmB,
-					SLStrecke).getY() < pE.getY())
-					|| pA.getY() == pE.getY()) { // fügt SegmE an Stelle mit
-													// richtiger absteigender Y
-													// Reihenfolge an x
-													// Koordinate des linken
-													// punkts von SegmE
+			if ((pA.getY() >= pE.getY() && iec.getIntersectionPoint(SegmB, SLStrecke).getY() < pE.getY())
+					|| pA.getY() == pE.getY()) { // fügt SegmE an Stelle mit richtiger absteigender Y Reihenfolge an x Koordinate des linken punkts von SegmE
+
 				SL.add(i + 1, segmE);
 				return new Strecke[] { SegmA, SegmB };
 			}
@@ -128,8 +142,7 @@ public class Main {
 	public static boolean insertIntersection(Point2D.Double intersectionPoint,
 			Strecke segmA, Strecke segmB) {
 
-		if (intersectionPoint != null) { // Wenn sie sich schneiden oder
-											// IntersectionPoint schon in L
+		if (intersectionPoint != null) { // Wenn sie sich schneiden oder IntersectionPoint schon in L
 			Event e = new Event(segmA, segmB) {
 				public void doEvent() {
 					treatIntersection(intersectionPoint, this);
@@ -152,18 +165,8 @@ public class Main {
 
 			// Wenns Intersection noch nicht gibt
 			if (queueEntry == null
-					|| !((queueEntry.strecke.equals(segmA) && queueEntry.strecke2
-							.equals(segmB)) || (queueEntry.strecke
-							.equals(segmB) && queueEntry.strecke2.equals(segmA)))) { // Wenn
-																						// das
-																						// Intersection
-																						// Event
-																						// noch
-																						// nicht
-																						// in
-																						// der
-																						// EventQueue
-																						// ist
+					|| !((queueEntry.strecke.equals(segmA) && queueEntry.strecke2.equals(segmB)) || (queueEntry.strecke.equals(segmB) && queueEntry.strecke2.equals(segmA)))) { // Wenn das Intersection Event noch nicht in der EventQueue ist
+
 				// Falls Anfangs oder Endpunkt in eventQueue mit gleichem Key
 				while (eventQueue.containsKey((double) intersectionPoint.getX()))
 					intersectionPoint.x = (double) intersectionPoint.getX() + 0.0001d;
@@ -303,9 +306,10 @@ public class Main {
 			Strecke s1 = L.get(i).getValue().strecke;
 			Strecke s2 = L.get(i).getValue().strecke2;
 			Point2D.Double p = L.get(i).getKey();
-			System.out.println( s1
+			/*System.out.println( s1
 					+ " schneidet sich mit  " + s2 + " in Punkt X:"
-					+ p.getX() + " Y: " + p.getY());
+					+ p.getX() + " Y: " + p.getY());*/
+			System.out.println(s1 + " " + s2 + " " + p.getX() + " " + p.getY());
 		}
 		System.out.println("Es exisitieren " + L.size() + "Schnittpunkte");
 	}
