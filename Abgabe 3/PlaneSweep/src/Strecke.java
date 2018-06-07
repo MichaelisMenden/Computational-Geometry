@@ -1,44 +1,83 @@
-import java.awt.Point;
 import java.awt.geom.Point2D;
 
+/*
+ * Klasse die eine Strecke mit Startpunkt und Endpunkt repräsentiert.
+ * @Author: Patrick Burger, Michael Wimmer
+ */
 
 public class Strecke {
 	private Point2D.Double start = new Point2D.Double();
 	private Point2D.Double end = new Point2D.Double();
 	
+	/*
+	 * Konstruktor zum Erstellen eines Streckenobjekts mit jeweils x und y Komponente für Start und Endpunkt.
+	 * @param xStart X-Koordinate des Startpunkts
+	 * @param yStart Y-Koordinate des Startpunkts
+	 * @param xEnd 	 X-Koordinate des Endpunkts
+	 * @param yEnd   Y-Koordinate des Endpunkts
+	 */
 	public Strecke(double xStart, double yStart, double xEnd, double yEnd) {
 		start.x = xStart;
 		start.y = yStart;
 		end.x = xEnd;
 		end.y = yEnd;
 	}
+	/*
+	 * Getter für Startpunkt
+	 * @return Startpunkt
+	 */
 	public Point2D.Double getStartPoint() {
 		return start;
 	}
+	/*
+	 * Getter für Endpunkt
+	 * @return Endpunkt
+	 */
 	public Point2D.Double getEndPoint() {
 		return end;
 	}
-
+	/*
+	 * Getter für X-Koordinate des Startpunkts
+	 * @return X-Koordinate des Startpunkts
+	 */
 	public double getxStart() {
 		return start.x;
 	}
-
+	/*
+	 * Getter für Y-Koordinate des Startpunkts
+	 * @return Y-Koordinate des Startpunkts
+	 */
 	public double getyStart() {
 		return start.y;
 	}
-
+	/*
+	 * Getter für X-Koordinate des Endpunkts
+	 * @return X-Koordinate des Endpunkts
+	 */
 	public double getxEnd() {
 		return end.x;
 	}
 
+	/*
+	 * Getter für Y-Koordinate des Endpunkts
+	 * @return Y-Koordinate des Endpunkts
+	 */
 	public double getyEnd() {
 		return end.y;
 	}
+	/*
+	 * Methode die Start- und End- X-Koordinate auf einen Wert setzt. Wird für die SweepLine verwendet.
+	 * @param x X-Wert auf den die Strecke gesetzt werden soll
+	 */
 	public void setBothX(double x) {
 		start.x = x;
 		end.x = x;
 	}
 	
+	/*
+	 * Methode die Strecken vergleicht
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object o) {
 		Strecke s = (Strecke) o;
@@ -49,6 +88,10 @@ public class Strecke {
 		return false;
 	}
 	
+	/*
+	 * Ausgabe einer Strecke (Formatiert zum einfügen in GeoGebra)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		//return "Start-X= " + start.x + "  Start-Y= " + start.y + "  End-X= " + end.x + "  End-Y= " + end.y;

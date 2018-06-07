@@ -5,11 +5,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/*
+ * Klasse welche Methoden zur Verfügung stellt um zu prüfen ob Strecken sich schneiden.
+ * @Author: Patrick Burger, Michael Wimmer 
+ */
 
 public class IntersectingEdgeChecker {
 	
-	
-	
+	/*
+	 * Methode zum Einlesen von Strecken aus Datei
+	 * @param path Pfad zur Datei mit Strecken
+	 * @return 	   Liste mit allen in Datei vorhandenen Strecken
+	 */
 	protected ArrayList<Strecke> readFile(String path) {
 		ArrayList<Strecke> Strecken = new ArrayList<Strecke>();
 		FileReader fr;
@@ -44,6 +51,13 @@ public class IntersectingEdgeChecker {
 		return Strecken;
 	}
 	
+	/*
+	 * Methode die prüft ob Punkt gegen den Uhrzeigersinn angeordnet sind.
+	 * @param p1 Erster Punkt
+	 * @param p2 Zweiter Punkt
+	 * @param p3 Dritter Punkt
+	 * @return   +: Im Uhrzeigersinn -: Gegen den Uhrzeigersinn
+	 */
 	public double ccw(Point2D.Double p1, Point2D.Double p2, Point2D.Double p3) {
 		double edge[] = new double[3];
 		edge[0] = (p2.x - p1.x) * (p2.y + p1.y);
@@ -52,6 +66,12 @@ public class IntersectingEdgeChecker {
 		return edge[0] + edge[1] + edge[2];
 	}
 	
+	/*
+	 * Methode die prüft ob zwei Strecken sich schneiden
+	 * @param s1 Erste Strecke
+	 * @param s2 Zweite Strecke
+	 * return 	 0: Kolinear und überlappend, 1: Schneiden sich -1: Schneiden sich nicht
+	 */
 	public int doIntersect(Strecke s1, Strecke s2) {
 		//kolinear und überlapppend
 			double test = ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getStartPoint());
@@ -68,14 +88,13 @@ public class IntersectingEdgeChecker {
 		return -1;
 	}
 	
+	/*
+	 * Methode die  den Schnittpunkt zwischen zwei Strecken berechnet.
+	 * @param s1 Erste Strecke
+	 * @param s2 Zweite Strecke
+	 * @return Schnittpunkt
+	 */
 	public Point2D.Double getIntersectionPoint(Strecke s1, Strecke s2) {
-		//Tausch falls s1 Linie mit nur einem Punkt ist
-		/*if(s1.getStartPoint().equals(s1.getEndPoint())) {
-			Strecke swap = s1;
-			s1 = s2;
-			s2 = swap;
-		}*/
-		int i = doIntersect(s1,s2);
 		if(doIntersect(s1,s2) == 1) {
 			Point2D.Double p1 = s1.getStartPoint();
 			Point2D.Double p2 = s1.getEndPoint();

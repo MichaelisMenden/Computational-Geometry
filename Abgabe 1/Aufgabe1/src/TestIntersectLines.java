@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import junit.framework.Assert;
 
 import org.junit.Test;
-
+/*
+ * Testklasse für IntersectionEdgeChecker
+ * @Author Patrick Burger, Michael Wimmer
+ */
 
 public class TestIntersectLines {
 	IntersectingEdgeChecker iec = new IntersectingEdgeChecker();

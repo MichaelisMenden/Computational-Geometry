@@ -1,11 +1,9 @@
-import java.awt.geom.Point2D;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 
-
+/*Main Klasse für Aufgabe 1.
+ * Liest alle 3 Testdatensätze ein und gibt die Anzahl der Schnittpunkte sowie die benötgte Zeit aus
+ * @Author Patrick Burger, Michael Wimmer
+ */
 
 public class Main {
 
@@ -16,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		IntersectingEdgeChecker iec = new IntersectingEdgeChecker();
 		//1.Datei
-		String path = "C:\\Users\\Michi\\Documents\\Computational Geometry\\Aufgabe1\\src\\s_1000_1.dat";
+		String path = ".\\src\\s_1000_1.dat";
 		Strecken = iec.readFile(path);
 		long start = System.currentTimeMillis();
 		for(Strecke s1 : Strecken) {
@@ -39,7 +37,7 @@ public class Main {
 		Strecken.clear();
 		
 		//2.Datei
-		path = "C:\\Users\\Michi\\Documents\\Computational Geometry\\Aufgabe1\\src\\s_10000_1.dat";
+		path = ".\\src\\s_10000_1.dat";
 		Strecken = iec.readFile(path);
 		start = System.currentTimeMillis();
 		for(Strecke s1 : Strecken) {
@@ -62,7 +60,7 @@ public class Main {
 		Strecken.clear();
 		
 		//3.Datei
-		path = "C:\\Users\\Michi\\Documents\\Computational Geometry\\Aufgabe1\\src\\s_100000_1.dat";
+		path = ".\\src\\s_100000_1.dat";
 		Strecken = iec.readFile(path);
 		start = System.currentTimeMillis();
 		for(Strecke s1 : Strecken) {
