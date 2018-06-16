@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /*Main Klasse für Aufgabe 1.
@@ -11,10 +14,10 @@ public class Main {
 	private static int intersectingLines = 0;
 	private static int overlappingLines = 0;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		IntersectingEdgeChecker iec = new IntersectingEdgeChecker();
 		//1.Datei
-		String path = ".\\src\\s_1000_1.dat";
+		String path = "s_1000_1.dat";
 		Strecken = iec.readFile(path);
 		long start = System.currentTimeMillis();
 		for(Strecke s1 : Strecken) {
@@ -35,11 +38,13 @@ public class Main {
 		
 		//Streckenliste leeren
 		Strecken.clear();
+		intersectingLines = 0;
+		overlappingLines = 0;
 		
 		//2.Datei
-		path = ".\\src\\s_10000_1.dat";
+		path = "s_10000_1.dat";
 		Strecken = iec.readFile(path);
-		start = System.currentTimeMillis();
+
 		for(Strecke s1 : Strecken) {
 			for(Strecke s2 : Strecken) {
 				if(s1.equals(s2))
@@ -58,10 +63,15 @@ public class Main {
 		
 		//Streckenliste leeren
 		Strecken.clear();
+		intersectingLines = 0;
+		overlappingLines = 0;
 		
 		//3.Datei
-		path = ".\\src\\s_100000_1.dat";
+		path = "s_100000_1.dat";
 		Strecken = iec.readFile(path);
+		FileWriter fw = new FileWriter("ausgabe.txt");
+	    BufferedWriter bw = new BufferedWriter(fw);
+		start = System.currentTimeMillis();
 		start = System.currentTimeMillis();
 		for(Strecke s1 : Strecken) {
 			for(Strecke s2 : Strecken) {
@@ -69,13 +79,16 @@ public class Main {
 					break;
 				if(iec.doIntersect(s1, s2) == 1) {
 					intersectingLines++;
+					bw.write(s1 + " " + s2 + "\r\n");
 				}
 				if(iec.doIntersect(s1, s2) == 0) {
 					overlappingLines++;
+					bw.write(s1 + " " + s2 + "\r\n");
 				}
 			}
 		}
 		end = System.currentTimeMillis();
+		bw.close();
 		System.out.println("Die Datei '" + path + "' hat " + intersectingLines + " sich schneidende Strecken und " + overlappingLines + " sich überlappende Linien");
 		System.out.println("Es wurden " + (end - start) + "Millisekunden gebraucht");
 		

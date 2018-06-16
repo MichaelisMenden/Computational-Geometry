@@ -1,4 +1,7 @@
 import java.awt.geom.Point2D;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Map.Entry;
@@ -11,7 +14,7 @@ import java.util.TreeSet;
  */
 
 public class Main {
-	public static String path = ".\\src\\s_1000_10.dat";
+	public static String path = ".\\src\\s_10000_1.dat";
 
 	private static TreeMap<Double, Event> eventQueue = new TreeMap<Double, Event>();
 	private static ArrayList<Strecke> SL = new ArrayList<Strecke>();
@@ -25,7 +28,7 @@ public class Main {
 	 * Main Methode in der alle Punkte in die EventQueue geladen werden und anschließend in aufsteigender Reihenfolge nach 
 	 * ihrer x-Koordinate abgearbeitet werden bis diese leer ist. Spezielle Linien wie z.B. senkrechte werden gesondert behandelt.
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		initEventQueue();
 		
 		long start = System.currentTimeMillis();
@@ -355,18 +358,23 @@ public class Main {
 	 * Ausgabe Methode am Ende des Algorithmus die alle Schnittpunkte mit zugehörigen Strecken ausgibt sowie die 
 	 * insgesamte Anzahl der Schnittpunkte ausgibt.
 	 */
-	public static void doOutput() {
-		System.out.println("Folgende Linien schneiden sich: ");
-		for (int i = 0; i < L.size(); i++) {
-			Strecke s1 = L.get(i).getValue().strecke;
-			Strecke s2 = L.get(i).getValue().strecke2;
-			Point2D.Double p = L.get(i).getKey();
-			/*System.out.println( s1
-					+ " schneidet sich mit  " + s2 + " in Punkt X:"
-					+ p.getX() + " Y: " + p.getY());*/
-			System.out.println(s1 + " " + s2 + " " + p.getX() + " " + p.getY());
+	public static void doOutput() throws IOException {
+		try{
+			System.out.println("Folgende Linien schneiden sich: ");
+			FileWriter fw = new FileWriter("ausgabe.txt");
+		    BufferedWriter bw = new BufferedWriter(fw);
+			for (int i = 0; i < L.size(); i++) {
+				Strecke s1 = L.get(i).getValue().strecke;
+				Strecke s2 = L.get(i).getValue().strecke2;
+				Point2D.Double p = L.get(i).getKey();
+				System.out.println(s1 + " " + s2 + " " + p.getX() + " " + p.getY());
+			    bw.write(s1 + " " + s2 + "\r\n");
+			}
+		    bw.close();
+			System.out.println("Es exisitieren " + L.size() + "Schnittpunkte");
+		}catch(Exception e) {
+			System.out.println(e.toString());
 		}
-		System.out.println("Es exisitieren " + L.size() + "Schnittpunkte");
 	}
 
 	/*
@@ -378,17 +386,13 @@ public class Main {
 		for (Strecke specialLine : specialLines) {
 			for (Strecke strecke : Strecken) {
 				// Behandlung von Strecken deren Anfangs und Endpunkt gleich ist
-				if (specialLine.getStartPoint().equals(
-						specialLine.getEndPoint())) {
+				if (specialLine.getStartPoint().equals(specialLine.getEndPoint())) {
 					// doIntersect kann nicht als einziges Kriterium verwendet
-					// werden, daher zusätzliche Abfrage ob überschneidung
-					// möglich ist
-					if (iec.doIntersect(specialLine, strecke) == 0 && 
-							((specialLine.getxStart() >= strecke.getxStart() && specialLine.getxStart() <= strecke.getxEnd()) && 
-							(specialLine.getyStart() >= strecke.getyStart() && specialLine.getyStart() <= strecke.getyEnd()))&& 
-							!specialLine.equals(strecke)) {
-						Point2D.Double intersectionPoint = iec
-								.getIntersectionPoint(specialLine, strecke);
+					// werden, daher zusätzliche Abfrage ob überschneidung möglich ist
+					if (iec.doIntersect(specialLine, strecke) == 0 && ((specialLine.getxStart() >= strecke.getxStart() && 
+						specialLine.getxStart() <= strecke.getxEnd()) && (specialLine.getyStart() >= strecke.getyStart() &&
+						specialLine.getyStart() <= strecke.getyEnd()))&& !specialLine.equals(strecke)) {
+						Point2D.Double intersectionPoint = iec.getIntersectionPoint(specialLine, strecke);
 						Event e = new Event(specialLine, strecke) {
 							public void doEvent() {
 								treatIntersection(intersectionPoint, this);
@@ -396,14 +400,14 @@ public class Main {
 						};
 						SimpleEntry<Point2D.Double, Event> se = new SimpleEntry<Point2D.Double, Event>(
 								intersectionPoint, e);
-						L.add(se);
+						if(!L.contains(se))
+							L.add(se);
 						continue;
 					}
 				} else {
 					// Behandlung vertikaler Strecken
 					if (iec.getIntersectionPoint(specialLine, strecke) != null) {
-						Point2D.Double intersectionPoint = iec
-								.getIntersectionPoint(specialLine, strecke);
+						Point2D.Double intersectionPoint = iec.getIntersectionPoint(specialLine, strecke);
 						Event e = new Event(specialLine, strecke) {
 							public void doEvent() {
 								treatIntersection(intersectionPoint, this);
@@ -411,7 +415,8 @@ public class Main {
 						};
 						SimpleEntry<Point2D.Double, Event> se = new SimpleEntry<Point2D.Double, Event>(
 								intersectionPoint, e);
-						L.add(se);
+						if(!L.contains(se))
+							L.add(se);
 						continue;
 					}
 				}

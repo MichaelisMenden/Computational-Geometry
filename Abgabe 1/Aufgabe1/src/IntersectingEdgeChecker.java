@@ -27,7 +27,16 @@ public class IntersectingEdgeChecker {
 		    String zeile = br.readLine();
 		    while(zeile != null) {
 		    	String[] zeilenArray = zeile.split(" ");
-		    	Strecke s = new Strecke(Float.parseFloat(zeilenArray[0]),Float.parseFloat(zeilenArray[1]),Float.parseFloat(zeilenArray[2]),Float.parseFloat(zeilenArray[3]));
+		    	//Die die links anfangen sind die Startpunkte
+		    	double x1 = Double.parseDouble(zeilenArray[0]);
+		    	double x2 = Double.parseDouble(zeilenArray[2]);
+		    	Strecke s;
+		    	if(x1 <= x2) {
+		    		s = new Strecke(x1,Double.parseDouble(zeilenArray[1]),x2,Double.parseDouble(zeilenArray[3]));
+		    	}
+		    	else {
+		    		s = new Strecke(x2,Double.parseDouble(zeilenArray[3]),x1,Double.parseDouble(zeilenArray[1]));
+		    	}	    	
 		    	Strecken.add(s);
 		    	zeile = br.readLine();
 		    }
@@ -49,11 +58,11 @@ public class IntersectingEdgeChecker {
 	 * @param p3 Dritter Punkt
 	 * @return   +: Im Uhrzeigersinn -: Gegen den Uhrzeigersinn
 	 */
-	public float ccw(Point2D.Float p1, Point2D.Float p2, Point2D.Float p3) {
-		float edge[] = new float[3];
+	public Double ccw(Point2D.Double p1, Point2D.Double p2, Point2D.Double p3) {
+		Double edge[] = new Double[3];
 		edge[0] = (p2.x - p1.x) * (p2.y + p1.y);
 		edge[1] = (p3.x - p2.x) * (p3.y + p2.y);
-		edge[2] = (p1.x - p3.x) * (p1.y + p3.y);
+		edge[2] = (p1.x - p3.x) * (p1.y + p3.y);	
 		return edge[0] + edge[1] + edge[2];
 	}
 	
@@ -64,6 +73,18 @@ public class IntersectingEdgeChecker {
 	 * return 	 0: Kolinear und überlappend, 1: Schneiden sich -1: Schneiden sich nicht
 	 */
 	public int doIntersect(Strecke s1, Strecke s2) {
+		//Plausibilitätstest
+		   // Beide Punkte der Linie sind weiter rechts als Endpunkt der anderen Linie
+		if((s1.getxStart() > s2.getxEnd() && s1.getxEnd() > s2.getxEnd()) ||
+			// Beide Punkte der Linie sind weiter links  als Startpunkt der anderen Linie
+			(s1.getxStart() < s2.getxStart() && s1.getxEnd() < s2.getxStart()) ||
+			//Beide Punkte der einen Linie sind komplett über den Punkten der anderen Linie			
+			(s1.getyStart() > s2.getyStart() && s1.getyStart() > s2.getyEnd() && s1.getyEnd() > s2.getyStart() && s1.getyEnd() > s2.getyEnd()) ||
+			//Beide Punkte der einen Linie sind komplett unter den Punkten der anderen Linie			
+			(s1.getyStart() < s2.getyStart() && s1.getyStart() < s2.getyEnd() && s1.getyEnd() < s2.getyStart() && s1.getyEnd() < s2.getyEnd())) {
+			
+			return -1;
+		}
 		//kolinear und überlapppend
 		if (ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getStartPoint()) == 0 && ccw(s1.getStartPoint(), s1.getEndPoint(),s2.getEndPoint()) == 0) {
 			return 0;	
