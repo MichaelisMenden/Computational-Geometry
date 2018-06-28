@@ -6,11 +6,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.*;
 import java.io.File;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class Main {
-
     public static void main(String[] args) {
+
+        List<FederalState> fedList = new ArrayList<FederalState>();
 
         try {
             File fXmlFile = new File("./src/DeutschlandMitStaedten.svg");
@@ -22,14 +26,36 @@ public class Main {
             Element el = doc.getElementById("Thüringen");
             Element containerElement = (Element) list.item(0);
             NodeList pathList = containerElement.getElementsByTagName("path");
-            Element firstState = (Element) pathList.item(0);
-            String stateName = firstState.getAttribute("id");
 
-            FederalState state = new FederalState(stateName, firstState.getAttribute("d"));
-            System.out.println(state.getStartPoint().component1());
+            // Iterate through all elements/states in list
+            for (int i = 0; i < pathList.getLength(); i++) {
+                Element element = (Element) pathList.item(i);
+                String stateName = element.getAttribute("id");
+                //System.out.println(stateName);
+
+                FederalState state = new FederalState(stateName, element.getAttribute("d"));
+                fedList.add(state);
+                //System.out.println(state.volume());
+            }
+
+            // Sort by volume (ascending)
+            Collections.sort(fedList, (FederalState s1, FederalState s2) ->{
+                return Float.compare(s1.volume(), s2.volume());
+            });
+
+            // print out to check order of states by volume
+            for( FederalState s: fedList)
+            {
+                System.out.println(s.getName());
+                System.out.println(s.volume());
+            }
+
+            
+
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
+
