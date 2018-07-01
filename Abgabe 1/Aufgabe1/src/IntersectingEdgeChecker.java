@@ -36,8 +36,10 @@ public class IntersectingEdgeChecker {
 		    	}
 		    	else {
 		    		s = new Strecke(x2,Double.parseDouble(zeilenArray[3]),x1,Double.parseDouble(zeilenArray[1]));
-		    	}	    	
-		    	Strecken.add(s);
+		    	}	 
+		    	if(!Strecken.contains(s)) {
+		    		Strecken.add(s);
+		    	}
 		    	zeile = br.readLine();
 		    }
 		    br.close();
@@ -74,7 +76,7 @@ public class IntersectingEdgeChecker {
 	 */
 	public int doIntersect(Strecke s1, Strecke s2) {
 		//Plausibilitätstest
-		   // Beide Punkte der Linie sind weiter rechts als Endpunkt der anderen Linie
+		// Beide Punkte der Linie sind weiter rechts als Endpunkt der anderen Linie
 		if((s1.getxStart() > s2.getxEnd() && s1.getxEnd() > s2.getxEnd()) ||
 			// Beide Punkte der Linie sind weiter links  als Startpunkt der anderen Linie
 			(s1.getxStart() < s2.getxStart() && s1.getxEnd() < s2.getxStart()) ||

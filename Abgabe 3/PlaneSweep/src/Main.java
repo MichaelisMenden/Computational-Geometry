@@ -14,7 +14,6 @@ import java.util.TreeSet;
  */
 
 public class Main {
-	public static String path = ".\\src\\s_10000_1.dat";
 
 	private static TreeMap<Double, Event> eventQueue = new TreeMap<Double, Event>();
 	private static ArrayList<Strecke> SL = new ArrayList<Strecke>();
@@ -23,13 +22,28 @@ public class Main {
 	private static IntersectingEdgeChecker iec = new IntersectingEdgeChecker();
 	private static Strecke SLStrecke = new Strecke(0, -10000, 0, 10000);
 	private static ArrayList<Strecke> specialLines = new ArrayList<Strecke>();
+	static int count = 1;
 
 	/*
-	 * Main Methode in der alle Punkte in die EventQueue geladen werden und anschließend in aufsteigender Reihenfolge nach 
-	 * ihrer x-Koordinate abgearbeitet werden bis diese leer ist. Spezielle Linien wie z.B. senkrechte werden gesondert behandelt.
+	 * Main Methode in der alle Streckendateien eingelesen werden und mit LineSweep untersucht werden
 	 */
 	public static void main(String[] args) throws IOException {
-		initEventQueue();
+		LineSweep(".\\src\\s_1000_1.dat");
+		clearLists();
+		LineSweep(".\\src\\s_1000_10.dat");
+		clearLists();
+		LineSweep(".\\src\\s_10000_1.dat");
+		clearLists();
+		LineSweep(".\\src\\s_100000_1.dat");
+		clearLists();
+	}
+	
+	/*
+	 * LineSweep Methode in der alle Punkte in die EventQueue geladen werden und anschließend in aufsteigender Reihenfolge nach 
+	 * ihrer x-Koordinate abgearbeitet werden bis diese leer ist. Spezielle Linien wie z.B. senkrechte werden gesondert behandelt.
+	 */
+	public static void LineSweep(String path) throws IOException {
+		initEventQueue(path);
 		
 		long start = System.currentTimeMillis();
 		while (!eventQueue.isEmpty()) {
@@ -43,19 +57,18 @@ public class Main {
 		}
 		treatSpecialLines();
 		long end = System.currentTimeMillis();
-		doOutput();
-		System.out.println(end - start + " ms");
+		doOutput(path, end - start);
+		
 	}
 	/*
 	 * Methode zum Initialisieren der eventQueue. Spezielle Linien werden in die Liste specialLines gespeichert.
 	 */
-	public static void initEventQueue() {
+	public static void initEventQueue(String path) {
 		Strecken = iec.readFile(path);
 		for (int i = 0; i < Strecken.size(); i++) {
 			Strecke strecke = Strecken.get(i);
 			// Behandlung von vertikalen Strecken
-			if (strecke.getxStart() == strecke.getxEnd()
-					&& strecke.getyStart() != strecke.getyEnd()) {
+			if (strecke.getxStart() == strecke.getxEnd() && strecke.getyStart() != strecke.getyEnd()) {
 				specialLines.add(strecke);
 				continue;
 			}
@@ -109,13 +122,11 @@ public class Main {
 		Strecke[] s = addToSL(e.getValue());
 
 		if (s[0] != null) {
-			final Point2D.Double intersectionPoint1 = iec.getIntersectionPoint(
-					(Strecke) e.getValue(), s[0]);
+			final Point2D.Double intersectionPoint1 = iec.getIntersectionPoint((Strecke) e.getValue(), s[0]);
 			insertIntersection(intersectionPoint1, (Strecke) e.getValue(), s[0]);
 		}
 		if (s[1] != null) {
-			final Point2D.Double intersectionPoint2 = iec.getIntersectionPoint(
-					(Strecke) e.getValue(), s[1]);
+			final Point2D.Double intersectionPoint2 = iec.getIntersectionPoint((Strecke) e.getValue(), s[1]);
 			insertIntersection(intersectionPoint2, (Strecke) e.getValue(), s[1]);
 		}
 	}
@@ -192,9 +203,8 @@ public class Main {
 			SimpleEntry<Point2D.Double, Event> se = new SimpleEntry<Point2D.Double, Event>(
 					intersectionPoint, e);
 			// Falls Schittpunkt Anfangspunkt eines der Segmente oder IntersectionPoint schon in L
-			if ((segmA.getStartPoint().equals(intersectionPoint) | segmB
-					.getStartPoint().equals(intersectionPoint))
-					&& !L.contains(se)) {
+			if ((segmA.getStartPoint().equals(intersectionPoint) | segmB.getStartPoint().equals(intersectionPoint)) &&
+					!L.contains(se)) {
 				L.add(se);
 				return true;
 			}
@@ -277,13 +287,11 @@ public class Main {
 					segmB);
 			// Falls durch Numerik ein Schnittpunkt weiter rechts gesetzt wird
 			// als Endpunkt
-			if (intersectionPoint != null
-					&& Math.abs(intersectionPoint.x - segmA.getxEnd()) < 0.00001
+			if (intersectionPoint != null && Math.abs(intersectionPoint.x - segmA.getxEnd()) < 0.00001
 					&& intersectionPoint.x > segmA.getxEnd()) {
 				intersectionPoint.x = segmA.getxEnd() - 0.00001d;
 			}
-			if (intersectionPoint != null
-					&& Math.abs(intersectionPoint.x - segmB.getxEnd()) < 0.00001
+			if (intersectionPoint != null && Math.abs(intersectionPoint.x - segmB.getxEnd()) < 0.00001
 					&& intersectionPoint.x > segmB.getxEnd()) {
 				intersectionPoint.x = segmB.getxEnd() - 0.00001d;
 			}
@@ -312,8 +320,7 @@ public class Main {
 	 * @param intersectionPoint Schnittpunkt
 	 * @param e					IntersectionEvent welches beide beteiligten Strecken enthält
 	 */
-	public static void treatIntersection(Point2D.Double intersectionPoint,
-			Event e) {
+	public static void treatIntersection(Point2D.Double intersectionPoint, Event e) {
 		Strecke segmA = null, segmB = null;
 		// Zu Ausgabeliste hinzufügen
 		L.add(new SimpleEntry<Point2D.Double, Event>(intersectionPoint, e));
@@ -330,11 +337,10 @@ public class Main {
 		if (indexStrecke1 < indexStrecke2) { // Strecke 1 war vorher höher als Strecke 2
 			if (indexStrecke1 != 0) { // Falls es nicht schon die höchste Strecke war
 				segmA = SL.get(indexStrecke1 - 1); // SegmentA ist 1 höher als Strecke 1 die vor Tausch höher als Strecke 2 war
-				final Point2D.Double iP = iec.getIntersectionPoint(e.strecke2,
-						segmA);
+				final Point2D.Double iP = iec.getIntersectionPoint(e.strecke2,segmA);
 				insertIntersection(iP, e.strecke2, segmA);
 			}
-			if (indexStrecke2 < SL.size() - 2) {// Falls es nicht schon die unterste Strecke war
+			if (indexStrecke2 < SL.size() - 1) {// Falls es nicht schon die unterste Strecke war
 				segmB = SL.get(indexStrecke2 + 1); // SegmentB ist 1 niedriger als Strecke 2 die Tausch niedriger als Strecke 1 war
 				final Point2D.Double iP2 = iec.getIntersectionPoint(e.strecke, segmB);
 				insertIntersection(iP2, e.strecke, segmB);
@@ -346,7 +352,7 @@ public class Main {
 				final Point2D.Double iP2 = iec.getIntersectionPoint(e.strecke, segmA);
 				insertIntersection(iP2, e.strecke, segmA);
 			}
-			if (indexStrecke1 < SL.size() - 2) {
+			if (indexStrecke1 < SL.size() - 1) {
 				segmB = SL.get(indexStrecke1 + 1);// SegmentB ist 1 niedriger als Strecke 1 die vor Tausch niedriger als Strecke 2 war
 				final Point2D.Double iP = iec.getIntersectionPoint(e.strecke2, segmB);
 				insertIntersection(iP, e.strecke2, segmB);
@@ -358,10 +364,10 @@ public class Main {
 	 * Ausgabe Methode am Ende des Algorithmus die alle Schnittpunkte mit zugehörigen Strecken ausgibt sowie die 
 	 * insgesamte Anzahl der Schnittpunkte ausgibt.
 	 */
-	public static void doOutput() throws IOException {
+	public static void doOutput(String path, long duration) throws IOException {
 		try{
-			System.out.println("Folgende Linien schneiden sich: ");
-			FileWriter fw = new FileWriter("ausgabe.txt");
+			System.out.println("Folgende Linien schneiden sich in Datei " + path + " : ");
+			FileWriter fw = new FileWriter("ausgabe"+ count++ +".txt");
 		    BufferedWriter bw = new BufferedWriter(fw);
 			for (int i = 0; i < L.size(); i++) {
 				Strecke s1 = L.get(i).getValue().strecke;
@@ -370,8 +376,12 @@ public class Main {
 				System.out.println(s1 + " " + s2 + " " + p.getX() + " " + p.getY());
 			    bw.write(s1 + " " + s2 + "\r\n");
 			}
-		    bw.close();
+		    
 			System.out.println("Es exisitieren " + L.size() + "Schnittpunkte");
+			System.out.println(duration + " ms");
+			bw.write("Es exisitieren " + L.size() + "Schnittpunkte");
+			bw.write(duration + " ms");
+			bw.close();
 		}catch(Exception e) {
 			System.out.println(e.toString());
 		}
@@ -413,8 +423,7 @@ public class Main {
 								treatIntersection(intersectionPoint, this);
 							}
 						};
-						SimpleEntry<Point2D.Double, Event> se = new SimpleEntry<Point2D.Double, Event>(
-								intersectionPoint, e);
+						SimpleEntry<Point2D.Double, Event> se = new SimpleEntry<Point2D.Double, Event>(intersectionPoint, e);
 						if(!L.contains(se))
 							L.add(se);
 						continue;
@@ -422,5 +431,14 @@ public class Main {
 				}
 			}
 		}
+	}
+	
+	public static void clearLists() {
+		L.clear();
+		eventQueue.clear();
+		SL.clear();
+		Strecken.clear();
+		SLStrecke = new Strecke(0, -10000, 0, 10000);
+		specialLines.clear();
 	}
 }

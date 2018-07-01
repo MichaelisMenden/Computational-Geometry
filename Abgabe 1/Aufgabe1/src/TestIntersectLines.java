@@ -41,12 +41,8 @@ public class TestIntersectLines {
 	@Test
 	public void testdoIntersect() {	
 		//Test kolinear und Überlappend
-		//Strecke s1 = new Strecke(0d,0d,2d,2d);
-		//Strecke s2 = new Strecke(1d,1d,3d,3d);
-		Strecke s1 = new Strecke(10.0,10.0,10.0,10.0);
-		Strecke s2 = new Strecke(10.0,10.0,10.0,10.1);
-		int a = iec.doIntersect(s1, s2);
-		int b = iec.doIntersect(s2, s1);
+		Strecke s1 = new Strecke(0d,0d,2d,2d);
+		Strecke s2 = new Strecke(1d,1d,3d,3d);
 		assertTrue(iec.doIntersect(s1, s2) == 0);
 		assertTrue(iec.doIntersect(s2, s1) == 0);
 		//Test kolinear und eine Strecke komplett in anderer Strecke

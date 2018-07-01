@@ -11,9 +11,30 @@ public class Main {
 	static ArrayList<String> Ausgabe3 = new ArrayList<String>();
 
 	public static void main(String[] args) {
-		Ausgabe1 = readFile(".\\src\\ausgabe1.txt");
-		Ausgabe3 = readFile(".\\src\\ausgabe3.txt");
+		Ausgabe1 = readFile(".\\src\\1_ausgabe100000.txt");
+		Ausgabe3 = readFile(".\\src\\3_ausgabe4.txt");
 		ArrayList<String> missingLines = new ArrayList<String>();
+		for(int i = 0; i < Ausgabe1.size(); i++) {
+			for(int j = 0; j < Ausgabe1.size(); j++) {
+				if(i != j) {
+					if(Ausgabe1.get(i).equals(Ausgabe1.get(j))) {
+						missingLines.add(Ausgabe1.get(i));
+						System.out.println(Ausgabe1.get(i));
+					}
+				}
+			}
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/*ArrayList<String> missingLines = new ArrayList<String>();
 		for(String line : Ausgabe1) {
 			if(!Ausgabe3.contains(line)) {
 				String lines[] = line.split(" ");
@@ -26,7 +47,7 @@ public class Main {
 			}
 		}
 
-		System.out.println(missingLines.size());
+		System.out.println(missingLines.size());*/
 	}
 	
 	public static ArrayList<String> readFile(String path) {

@@ -1,0 +1,11 @@
+Strecke(Punkt[{10.0,10.0}],Punkt[{10.0,10.0}]) Strecke(Punkt[{10.0,10.0}],Punkt[{10.1,10.1}])
+Strecke(Punkt[{10.0,10.0}],Punkt[{10.0,10.1}]) Strecke(Punkt[{10.0,10.0}],Punkt[{10.1,10.1}])
+Strecke(Punkt[{10.0,10.0}],Punkt[{10.0,10.1}]) Strecke(Punkt[{10.0,10.0}],Punkt[{10.0,10.0}])
+Strecke(Punkt[{10.0,10.0}],Punkt[{10.1,10.0}]) Strecke(Punkt[{10.0,10.0}],Punkt[{10.1,10.1}])
+Strecke(Punkt[{10.0,10.0}],Punkt[{10.1,10.0}]) Strecke(Punkt[{10.0,10.0}],Punkt[{10.0,10.0}])
+Strecke(Punkt[{10.0,10.0}],Punkt[{10.1,10.0}]) Strecke(Punkt[{10.0,10.0}],Punkt[{10.0,10.1}])
+Strecke(Punkt[{11.662,89.2365}],Punkt[{11.774,89.646}]) Strecke(Punkt[{11.592,89.627}],Punkt[{12.2213,88.9493}])
+Strecke(Punkt[{2.295,25.856}],Punkt[{3.06992,26.4487}]) Strecke(Punkt[{2.9101,26.2454}],Punkt[{2.921,26.429}])
+Strecke(Punkt[{72.2693,25.329}],Punkt[{72.651,25.149}]) Strecke(Punkt[{72.2035,25.216}],Punkt[{72.675,25.331}])
+Strecke(Punkt[{43.3651,48.9798}],Punkt[{43.794,49.185}]) Strecke(Punkt[{43.499,49.031}],Punkt[{43.5973,49.499}])
+Die Datei 's_1000_1.dat' hat 7 sich schneidende Strecken und 3 sich überlappende LinienEs wurden 109Millisekunden gebraucht
