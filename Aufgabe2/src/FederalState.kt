@@ -2,17 +2,25 @@ import java.awt.geom.Point2D
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
+/*
+ * @Author: Michael Wimmer, Patrick Burger
+ *
+ * Federal State data class & CapitalCity data class
+ */
+
 const val DEBUG = false
 
-typealias Coords = Pair<Float, Float>
+// typealias for better handling coordinate pairs
+public typealias Coords = Pair<Float, Float>
 
-data class CapitalCity(val name: String, val centerX: String, val centerY: String) {
-    val center: Coords
-        get() = Coords(centerX.toFloat(), centerY.toFloat())
-}
-
+/*
+ * Federal State data class representing a state
+ */
 data class FederalState(val name: String) {
-    // data class Region(val startPoint: Coords, val edges: List<Coords>, val vertices: List<Coords>) {
+
+    /*
+     * Internal Region class representing separated areas of a state
+     */
     class Region() {
         var startPoint = Coords(0.0f, 0.0f)
         var edges: List<Coords> = listOf()
@@ -115,6 +123,7 @@ data class FederalState(val name: String) {
 
         }
 
+        // get volume of region
         fun volume(): Float {
             // Gauss's area formula, A = Summe[(yi + yiplus1)/2 * (xi - xiplus1)] for i=1....n
             var volume = 0.0f
@@ -127,6 +136,7 @@ data class FederalState(val name: String) {
             return volume
         }
 
+        // check if point is in region
         fun pointInRegion(point: Coords): Boolean {
             val outOfRegion = Coords(maxX+1, maxY+1)
             val schnittStrecke = Strecke(point.first.toDouble(), point.second.toDouble(), outOfRegion.first.toDouble(), outOfRegion.second.toDouble())
@@ -194,13 +204,14 @@ data class FederalState(val name: String) {
         }
     }
 
+    // get volume of state
     fun volume(): Float {
         var vol = 0.0f
         for (region in regions) {
 
             val regVol = region.volume()
             //vol += if (region.isCCW()) regVol else -regVol
-            vol += regVol
+            vol += abs(regVol)
 
             if (regVol < 0.0f) {
                 //println("negative region in " + this.name + " with volume " + regVol.toString() + "\n")
@@ -212,13 +223,15 @@ data class FederalState(val name: String) {
         return abs(vol) * 1.16f
     }
 
+    // check if point is in one of the state's regions
     fun pointInRegion(point: Coords): Boolean {
+        var pIR = false
         for (region in regions) {
             if (region.pointInRegion(point)) {
-                return true
+                pIR = if(pIR == true) false else true
             }
         }
-        return false
+        return pIR
     }
 }
 

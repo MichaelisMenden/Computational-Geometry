@@ -1,15 +1,19 @@
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
-import org.apache.batik.apps.rasterizer.SVGConverter;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.*;
 import java.io.File;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+
+/*
+ * @Author: Michael Wimmer, Patrick Burger
+ *
+ * main class
+ * - Reading Data
+ * - Prints for Evaluating Code
+ */
 
 public class Main {
     public static void main(String[] args) {
@@ -18,10 +22,10 @@ public class Main {
         List<CapitalCity> capitals = new ArrayList<CapitalCity>();
 
         try {
-            File fXmlFile = new File("./src/DeutschlandMitStaedten.svg");
+            File fXmlFile = new File("./resources/DeutschlandMitStaedten.svg");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse("./src/DeutschlandMitStaedten.svg");
+            Document doc = dBuilder.parse("./resources/DeutschlandMitStaedten.svg");
 
             NodeList list = doc.getElementsByTagName("g");
             Element el = doc.getElementById("Thüringen");
