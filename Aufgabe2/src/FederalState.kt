@@ -1,8 +1,15 @@
+import java.awt.geom.Point2D
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 const val DEBUG = false
 
 typealias Coords = Pair<Float, Float>
+
+data class CapitalCity(val name: String, val centerX: String, val centerY: String) {
+    val center: Coords
+        get() = Coords(centerX.toFloat(), centerY.toFloat())
+}
 
 data class FederalState(val name: String) {
     // data class Region(val startPoint: Coords, val edges: List<Coords>, val vertices: List<Coords>) {
@@ -11,22 +18,45 @@ data class FederalState(val name: String) {
         var edges: List<Coords> = listOf()
         var vertices: MutableList<Coords> = mutableListOf()
 
-        constructor(rawCoordinates: List<String>): this() {
+        // convert vertices to List<Strecken>
+        val strecken: List<Strecke>
+            get() = listOf(mutableListOf<Coords>(startPoint), vertices).flatten().mapIndexedNotNull{ id, coords ->
+                if (id <= vertices.lastIndex) {
+                    val next = vertices.elementAt(id)
+                    Strecke(coords.first.toDouble(), coords.second.toDouble(), next.first.toDouble(), next.second.toDouble())
+                } else {
+                    null
+                }
+            }
+
+        // get maximum x-coordinate in region
+        val maxX: Float
+            get() = vertices.map { it.first }.max()!!
+
+        // get maximum y-coordinate in region
+        val maxY: Float
+            get() = vertices.map { it.second }.max()!!
+
+        constructor(rawCoordinates: List<String>) : this() {
             val mRawCoordinates: MutableList<String> = rawCoordinates.toMutableList()
 
             /* start point */
-            if (DEBUG) { println(" #" + mRawCoordinates.count()) }
+            if (DEBUG) {
+                println(" #" + mRawCoordinates.count())
+            }
             this.startPoint = if (mRawCoordinates.first().first() == 'M') {
                 Region.coordsFromRaw(mRawCoordinates.removeAt(0))
             } else {
                 throw IllegalArgumentException("Invalid starting point value")
             }
-            if (DEBUG) { println(" #" + mRawCoordinates.count())}
+            if (DEBUG) {
+                println(" #" + mRawCoordinates.count())
+            }
 
             /* edges */
             this.edges = mRawCoordinates.mapIndexedNotNull { index, s ->
                 // get absolute coordinates of predecessor, if index == 0 use startPoint
-                val predecessor = if (index == 0) startPoint else vertices.elementAt(index -1)
+                val predecessor = if (index == 0) startPoint else vertices.elementAt(index - 1)
 
                 when (s.first()) {
                 // "Line To with relative coordinates"
@@ -57,12 +87,16 @@ data class FederalState(val name: String) {
                     }
                 // "Close Path"
                     'z' -> {
-                        if (DEBUG) { println("Arrived at end point") }
+                        if (DEBUG) {
+                            println("Arrived at end point")
+                        }
                         null
                     }
 
                     else -> {
-                        if (DEBUG) { print("This should never happen!") }
+                        if (DEBUG) {
+                            print("This should never happen!")
+                        }
                         null
                     }
                 }
@@ -70,10 +104,14 @@ data class FederalState(val name: String) {
 
             // short check
             if (vertices.count() == edges.count()) {
-                if (DEBUG) { println("vertices == edges: #${vertices.count()}") }
+                if (DEBUG) {
+                    println("vertices == edges: #${vertices.count()}")
+                }
             } else {
                 throw ArithmeticException("vertices != edges")
             }
+
+
 
         }
 
@@ -82,11 +120,38 @@ data class FederalState(val name: String) {
             var volume = 0.0f
             var predecessor = startPoint
             for ((index, vertex) in vertices.withIndex()) {
-                volume += (predecessor.second + vertex.second)/2 * (-edges[index].first)
+                volume += (predecessor.second + vertex.second) / 2 * (-edges[index].first)
                 predecessor = vertex
             }
 
             return volume
+        }
+
+        fun pointInRegion(point: Coords): Boolean {
+            val outOfRegion = Coords(maxX+1, maxY+1)
+            val schnittStrecke = Strecke(point.first.toDouble(), point.second.toDouble(), outOfRegion.first.toDouble(), outOfRegion.second.toDouble())
+            var s = 0
+            val iSEC = IntersectingEdgeChecker()
+
+            for (strecke in strecken) {
+                val intersect = iSEC.doIntersect(strecke, schnittStrecke)
+                when (intersect) {
+                    1 -> s++
+                }
+            }
+
+            val isInRegion = s % 2 != 0
+
+            return isInRegion
+        }
+
+        fun isCCW(): Boolean {
+            val iSEC = IntersectingEdgeChecker()
+            val p1 = Point2D.Double(startPoint.first.toDouble(), startPoint.second.toDouble())
+            val p2 = Point2D.Double(vertices.get(0).first.toDouble(), vertices.get(0).second.toDouble())
+            val p3 = Point2D.Double(vertices.get(1).first.toDouble(), vertices.get(1).second.toDouble())
+
+            return iSEC.ccw(p1, p2, p3) < 0
         }
 
         companion object {
@@ -105,12 +170,15 @@ data class FederalState(val name: String) {
     var regions: ArrayList<Region> = ArrayList()
 
     constructor(name: String, concatenatedPath: String) : this(name) {
-        if (DEBUG) { println("- $name") }
+        if (DEBUG) {
+            println("- $name")
+        }
         val pathList = concatenatedPath.split(" ").filter { it != "" }
         val regionBounds: List<Pair<Int, Int>> = pathList.mapIndexedNotNull { index, s ->
             if (s.first() == 'M') {
                 val tailIndex = pathList.subList(index, pathList.lastIndex + 1).indexOfFirst {
-                    it.first() == 'z' }
+                    it.first() == 'z'
+                }
                 Pair(index, index + tailIndex + 1)
             } else {
 
@@ -119,7 +187,9 @@ data class FederalState(val name: String) {
         }
 
         for (bounds in regionBounds) {
-            if (DEBUG) { println(" first: ${bounds.first}, tail: ${bounds.second}") }
+            if (DEBUG) {
+                println(" first: ${bounds.first}, tail: ${bounds.second}")
+            }
             this.regions.add(Region(pathList.subList(bounds.first, bounds.second)))
         }
     }
@@ -129,101 +199,26 @@ data class FederalState(val name: String) {
         for (region in regions) {
 
             val regVol = region.volume()
-            vol += abs(regVol)
+            //vol += if (region.isCCW()) regVol else -regVol
+            vol += regVol
+
             if (regVol < 0.0f) {
-                //print("negative region \n")
+                //println("negative region in " + this.name + " with volume " + regVol.toString() + "\n")
+            } else {
+                //println("positive region " + regVol.toString() + "\n")
             }
         }
 
-        return vol * 1.1f
+        return abs(vol) * 1.16f
     }
-//
-//    constructor(name: String, concatenatedPath: String) : this(name) {
-//        val pathList = concatenatedPath.split(" ").filter { it != "" }
-//
-//        // Find start point
-//        val sPoint = if (pathList.first().first() == 'M') {
-//            val coords = pathList.first().drop(1).split(",")
-//            Pair(coords[0].toFloat(), coords[1].toFloat())
-//        } else {
-//            null
-//        }
-//
-//        if (sPoint != null) {
-//            startPoint = sPoint
-//        }
-//
-//        /* Just for testing see few lines below
-//
-//        val a: Float = 312.023f
-//        val t: Float = "-1.666".toFloat()
-//        System.out.println(a-t)
-//
-//        var test: Float = startPoint!!.first
-//
-//        */
-//
-//        // Find edges
-//        edges = pathList.mapNotNull { it ->
-//            when (it.drop(1)) {
-//            // "Line To with relative coordinates"
-//                "l" -> {
-//                    val coords = it.split(",")
-//                    Pair(coords[0].toFloat(), coords[1].toFloat())
-//                }
-//            // "Line To with absolute coordinates"
-//                "L" -> {
-//
-//                }
-//
-//            // "Close Path"
-//                "z" -> {
-//
-//                }
-//
-//                else -> {
-//                    print("This should never happen!")
-//                    null
-//                }
-//            }
-//            if (it.first() == 'l') {
-//                val coords = it.drop(1).split(",")
-//                /* MANUAL TESTING: Just for testing but Float test after adding a negative value, test has more than 3 decimals???
-//
-//                val t: Float = coords[0].toFloat()
-//                System.out.println(t)
-//                test = test + t
-//
-//                */
-//
-//                Pair(coords[0].toFloat(), coords[1].toFloat())
-//
-//            } else {
-//                null
-//            }
-//        }
-//
-//        edges.let {
-//            it.fold(startPoint, { last, next ->
-//                val point = Pair(last.first + next.first, last.second + next.second)
-//                this.vertices.add(point)
-//                point
-//            })
-//        }
-//
-//        // letzter Punkt/letzte Edge fehlt noch da L ignoriert wird momentan
-//        print(1)
-//    }
 
-//    fun volume(): Float {
-//        // Gauss's area formula, A = Summe[(yi + yiplus1)/2 * (xi - xiplus1)] for i=1....n
-//        var volume = 0.0f
-//        var predecessor = startPoint
-//        for ((index, vertice) in vertices.withIndex()) {
-//            volume += (predecessor.second + vertice.second)/2 * edges[index].first
-//            predecessor = vertice
-//        }
-//
-//        return volume
-//    }
+    fun pointInRegion(point: Coords): Boolean {
+        for (region in regions) {
+            if (region.pointInRegion(point)) {
+                return true
+            }
+        }
+        return false
+    }
 }
+
